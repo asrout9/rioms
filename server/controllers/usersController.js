@@ -2,6 +2,7 @@ const usersData = require('../users');
 const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
 
 //Display all users
 const getAllUsers = async (req, res) => {
@@ -63,7 +64,8 @@ const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (user && bcrypt.compareSync(password, user.password)) {
-      res.status(200).json({ user });
+      var token = jwt.sign({ user }, process.env.SECRETE);
+      res.status(200).json({ token });
     } else {
       res.status(400).json({ message: [{ msg: 'Invalid credentials' }] });
     }
